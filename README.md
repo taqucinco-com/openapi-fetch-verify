@@ -4,7 +4,7 @@
 $ docker compose up --build
 $ docker compose exec app bash
 
-# node index.js
+# npm start
 ```
 
 `http://localhost:3030/test?param=400`  
