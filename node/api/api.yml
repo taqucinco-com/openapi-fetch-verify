@@ -6,6 +6,13 @@ paths:
   /sample:
     get:
       summary: Returns a sample JSON response
+      parameters:
+        - in: query
+          name: param
+          schema:
+            type: string
+          required: false
+          description: status code
       responses:
         '200':
           description: Successful response
@@ -30,7 +37,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Unauthorized
+          description: Forbidden
           content:
             application/json:
               schema:
