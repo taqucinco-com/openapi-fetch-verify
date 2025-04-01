@@ -1,10 +1,19 @@
 services:
-  app:
+  be:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./be/Dockerfile
     tty: true
     volumes:
-      - ./node:/app
+      - ./be:/app
     ports:
       - 3030:3030
+  fe:
+    build:
+      context: .
+      dockerfile: ./fe/Dockerfile
+    tty: true
+    volumes:
+      - ./fe:/app
+    ports:
+      - 8000:8000

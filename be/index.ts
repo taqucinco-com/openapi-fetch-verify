@@ -1,6 +1,7 @@
-import express, { Request, Response } from 'express'
+import express, { query, Request, Response } from 'express'
 import createClient from "openapi-fetch"
 import type { paths } from "./generated/api.d.ts"
+import cors from 'cors' 
 
 interface ErrorResponse {
     code: number;
@@ -13,7 +14,9 @@ interface SuccessResponse {
 
 const app = express()
 const port: number = 3030
-const client = createClient<paths>({ baseUrl: "http://localhost:3030/" });
+// CORSミドルウェアを設定
+app.use(cors({ origin: 'http://localhost:8000' }))
+
 
 app.get('/', (_req: Request, res: Response) => {
     res.send('Hello World!')
@@ -30,25 +33,36 @@ app.get('/sample', async (req: Request, res: Response) => {
         res.status(403).json({ code: 2, reason: 'Forbidden' } as ErrorResponse)
     } else if (param === '500') {
         res.status(500).json({ foo: 'bar' })
+    } else if (param === 'unknown') {
+        res.status(200).json({ bar: 'foo' })
     } else {
         res.status(200).json({ id: 0 } as SuccessResponse)
     }
 })
 
-app.get('/echo', async (req: Request, res: Response) => {
-    const { data, error } = await client.GET("/sample", {
+app.get('/openapi-fetch', async (req: Request, res: Response) => {
+    const client = createClient<paths>({ baseUrl: "http://localhost:3030/" });
+    const { data, error, response } = await client.GET("/sample", {
         params: {
             query: { param: '500' },
         },
     })
-    console.log(data)
-    console.log(error)
+    console.log(response)
 
     if (error) {
         res.status(500).json(error as ErrorResponse)
     } else {
         res.status(200).json(data as SuccessResponse)
     }
+})
+
+app.get('/fetch', async (req: Request, res: Response) => {
+    const response = await fetch("http://localhost:3030/sample?param=200")
+    console.log(response)
+    const json = await response.json()
+    const data = json as paths["/sample"]["get"]["responses"]["200"]["content"]["application/json"];
+
+    res.status(response.status).json({ ...data });
 })
 
 app.listen(port, () => {
