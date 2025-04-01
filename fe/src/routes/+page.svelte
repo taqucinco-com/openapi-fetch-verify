@@ -1,7 +1,7 @@
 <script lang="ts">
 
 $effect(() => {
-    fetch('/sample')
+    fetch('/api/sample')
         .then((response) => {
             console.log(response)
             response.text().then(data => console.log(data))
